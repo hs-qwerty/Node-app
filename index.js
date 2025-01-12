@@ -1,26 +1,26 @@
-const express = require('express');
+const express = require("express");
+const mongoose = require("mongoose");
+const { PORT } = require("./config/config.js");
+const { statusCheck } = require("./controllers/krakenController.js");
+const cron = require("node-cron");
+
+// router
+const krakenRoute = require("./router/kraken.js");
+
 const app = express();
-const mongoose = require('mongoose');
-const dotenv = require('dotenv');
-
-const authRoute = require('./router/auth');
-const ItemRouteModule = require('./router/item');
-
-dotenv.config();
-
-mongoose.connect(
-    process.env.DB_CONNETCT,
-    { useNewUrlParser: true, useUnifiedTopology: true },
-    () => console.log('tamamke')
-);
 
 //middleware
-
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
+// cron tab
+cron.schedule("* * * * *", () => {
+  console.log("Running health checks...");
+  statusCheck();
+});
 
-app.use('/api/user', authRoute);
+app.use("/kraken", krakenRoute);
 
-app.use('/item', ItemRouteModule);
-
-app.listen(3000, () => console.log('tamam gel'));
+app.listen(PORT, () => {
+  console.log(`Server listen at port ${PORT}`);
+});

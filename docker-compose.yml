@@ -1,0 +1,60 @@
+version: "3.8"
+
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+      - "4000:4000"
+    restart: always
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    environment:
+      - PORT=3000
+    networks:
+      - nodejs
+  # mysql:
+  #   container_name: db
+  #   image: mysql:5.7
+  #   restart: always
+  #   environment:
+  #     MYSQL_DATABASE: ${MYSQL_DATABASE-nodejs}
+  #     MYSQL_USER: ${MYSQL_USER-nodejs}
+  #     MYSQL_PASSWORD: ${MYSQL_PASSWORD-nodejs}
+  #     MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD-root}
+  #   volumes:
+  #     - ./docker/:/docker-entrypoint-initdb.d
+  #   ports:
+  #     - "3308:3306"
+  #   networks:
+  #     - nodejs
+
+  # phpmyadmin:
+  #   image: phpmyadmin:5.2.1-apache
+  #   container_name: phpmyadmin
+  #   restart: unless-stopped
+  #   ports:
+  #     - "8383:80"
+  #   environment:
+  #     PMA_HOST: mysql
+  #     PMA_PORT: 3306
+  #     PMA_USER: nodejs
+  #     PMA_PASSWORD: nodejs
+  #   depends_on:
+  #     - mysql
+  #   networks:
+  #     - nodejs
+
+  redis_service:
+    image: "redis:alpine"
+    container_name: redis_service
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - nodejs
+
+networks:
+  nodejs:
+    driver: bridge
